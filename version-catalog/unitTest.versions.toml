@@ -1,0 +1,16 @@
+[metadata]
+version="1.0"
+
+[versions]
+junit-jupiter-api = "5.11.0"
+junit-jupiter-engine = "5.11.0"
+
+[libraries.junitJupiterAPI]
+group="org.junit.jupiter"
+name="junit-jupiter-api"
+version.ref="junit-jupiter-api"
+
+[libraries.junitJupiterEngine]
+group="org.junit.jupiter"
+name="junit-jupiter-engine"
+version.ref="junit-jupiter-engine"

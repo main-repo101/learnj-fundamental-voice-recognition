@@ -1,0 +1,10 @@
+
+.gradle/
+.idea/
+.misc/
+build/
+lib/
+
+.env.dev*
+.env.local
+
