@@ -145,6 +145,7 @@ public class MainExe {
             if (recognizer.acceptWaveForm(buffer, bytesRead)) {
               String result = recognizer.getResult();
               System.out.println("Recognized: " + result);
+              //REM: [TODO] .|. Remove Duplication (Refactor)
               if (result.toLowerCase().contains(MainExe.MAGIC_PHRASE)) {
                 System.out.println("Magic phrase detected! Activating post-listening...");
                 MainExe.startPostListening(recognizer, microphone);  //REM: Move to post-listening mode
@@ -155,9 +156,19 @@ public class MainExe {
                 micMonitorThread.join();
                 break; //REM: Break out of pre-listening
               }
-
             } else {
-              System.out.println("Partial result: " + recognizer.getPartialResult());
+              String result = recognizer.getPartialResult();
+              System.out.println("Partial result: " + (result));
+              if (result.toLowerCase().contains(MainExe.MAGIC_PHRASE)) {
+                System.out.println("Magic phrase detected! Activating post-listening...");
+                MainExe.startPostListening(recognizer, microphone);  //REM: Move to post-listening mode
+
+              }
+              else if(result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
+                MainExe.isOut = true;
+                micMonitorThread.join();
+                break; //REM: Break out of pre-listening
+              }
             }
           }
         }
@@ -191,16 +202,16 @@ public class MainExe {
         if (bytesRead > 0) {
           if (recognizer.acceptWaveForm(buffer, bytesRead)) {
             String result = recognizer.getResult();
-            System.out.println("Post-listening recognized: " + result);
 
 //            final int indexBegin = result.indexOf(':') + 1;
 //            result = result.substring(indexBegin, result.length() - 1).trim();
 //            result = result.replaceAll("^\"|\"$", "").trim();
             System.out.println("Post-listening recognized: " + result);
             //REM: Add logic to handle post-listening commands or actions
+            //REM: [TODO] .|. Remove Duplication (Refactor)
             if (result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
               MainExe.isOut = true;
-              Thread.sleep(1500);
+              Thread.sleep(2500);
               break; //REM: Break out of post-listening
             }
             else if (result.toLowerCase().contains(LBL_CMD_ABORT)) {
@@ -209,7 +220,12 @@ public class MainExe {
           } else {
             String result = recognizer.getPartialResult();
             System.out.println("Post-listening Partial result: " + result);
-            if (result.toLowerCase().contains(LBL_CMD_ABORT)) {
+            if (result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
+              MainExe.isOut = true;
+              Thread.sleep(2500);
+              break; //REM: Break out of post-listening
+            }
+            else if (result.toLowerCase().contains(LBL_CMD_ABORT)) {
               break; //REM: Break out of post-listening
             }
           }
