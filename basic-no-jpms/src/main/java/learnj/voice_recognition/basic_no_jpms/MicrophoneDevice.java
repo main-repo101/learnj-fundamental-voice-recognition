@@ -10,29 +10,43 @@ import javax.sound.sampled.TargetDataLine;
 public class MicrophoneDevice implements IAudioDeviceChecker {
 
   public MicrophoneDevice() {
-    this.mixerInfos = AudioSystem.getMixerInfo();
+    this.init();
+  }
+
+  private void init() {
+    //REM: [TODO, IS_IT_PROPER]
+    this.reload();
   }
 
   @Override
   public boolean isAvailable() {
-    return this.getMicrophone() != null;
+    return this.microphone != null;
   }
 
   @Override
   public boolean isMuted() {
-    DataLine microphone = this.getMicrophone();
-    if( microphone == null ) return true;
-    return !IAudioDeviceChecker.canAccessMicrophone(microphone);
+    if( this.microphone == null ) return true;
+    return !IAudioDeviceChecker.canAccessMicrophone(this.microphone);
   }
 
   @Override
   public void reload() {
     this.mixerInfos = AudioSystem.getMixerInfo();
+    this.microphone = MicrophoneDevice.findMicrophone( this.mixerInfos );
   }
 
   public TargetDataLine getMicrophone() {
-//    this.reload();
-    for(Mixer.Info mixerInfo : this.mixerInfos ) {
+    return this.microphone;
+  }
+
+  public Mixer.Info[] getMixerInfos() {
+    return this.mixerInfos.clone(); //REM: [TODO], is this clone gonna work?
+  }
+
+  private static TargetDataLine findMicrophone(
+    Mixer.Info[] mixerInfos
+  ) {
+    for(Mixer.Info mixerInfo : mixerInfos ) {
       Mixer mixer = AudioSystem.getMixer(mixerInfo);
       Line.Info[] lineInfos = mixer.getTargetLineInfo();
       for( Line.Info lineInfo : lineInfos ) {
@@ -50,4 +64,5 @@ public class MicrophoneDevice implements IAudioDeviceChecker {
   }
 
   private Mixer.Info[] mixerInfos;
+  private TargetDataLine microphone;
 }
