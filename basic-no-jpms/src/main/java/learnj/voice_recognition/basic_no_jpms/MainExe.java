@@ -34,8 +34,10 @@ public class MainExe {
   private static volatile boolean isOut = false;
 
   public static void main(String[] args) {
+    MicrophoneDevice microphoneDevice = new MicrophoneDevice();
+    System.out.println( microphoneDevice );
 //    MainExe.checkFile();
-    MainExe.mainV0(args);
+//    MainExe.mainV0(args);
     System.out.printf("::: %s, %s\n%s, done\n",
       "Hi there", MainExe.class, LibVosk.class
     );

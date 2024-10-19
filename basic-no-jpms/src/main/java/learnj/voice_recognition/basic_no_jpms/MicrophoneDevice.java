@@ -6,6 +6,7 @@ import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.TargetDataLine;
+import java.util.Arrays;
 
 public class MicrophoneDevice implements IAudioDeviceChecker {
 
@@ -61,6 +62,17 @@ public class MicrophoneDevice implements IAudioDeviceChecker {
       }
     }
     return null;
+  }
+
+  public String toString() {
+    return String.format( "%s@%x[ mixerInfos=%s, microphone='%s', isAvailable=%b, canDetectSound=%b ]",
+      this.getClass().getCanonicalName(),
+      this.hashCode(),
+      Arrays.toString(this.mixerInfos),
+      this.microphone,
+      this.isAvailable(),
+      !this.isMuted()
+    );
   }
 
   private Mixer.Info[] mixerInfos;
