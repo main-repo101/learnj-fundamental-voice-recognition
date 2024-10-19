@@ -1,6 +1,5 @@
 package learnj.voice_recognition.basic_no_jpms;
 
-import com.sun.tools.javac.Main;
 import org.vosk.LibVosk;
 import org.vosk.LogLevel;
 import org.vosk.Model;
@@ -20,11 +19,16 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class MainExe {
 
   private static final String MAGIC_PHRASE = /*"machine"*/"mirror mirror on the wall";
-  private static final String LBL_CMD_IMMEDIATE_SHUTDOWN = "shut down hashtag one four three";
+  private static final String[] LBL_CMD_IMMEDIATE_SHUTDOWN = {
+    "shut down hashtag one four three",
+    "shut down hashtag one for three",
+    "shut down hashtag one for tree"
+  };
   private static final String LBL_CMD_ABORT = "never mind";
   private static volatile boolean isMicrophoneConnected = false;
   private static volatile boolean isOut = false;
@@ -145,17 +149,17 @@ public class MainExe {
             if (recognizer.acceptWaveForm(buffer, bytesRead)) {
               String result = recognizer.getResult();
               System.out.println("Recognized: " + result);
-              //REM: [TODO] .|. Remove Duplication (Refactor)
-              if (result.toLowerCase().contains(MainExe.MAGIC_PHRASE)) {
-                System.out.println("Magic phrase detected! Activating post-listening...");
-                MainExe.startPostListening(recognizer, microphone);  //REM: Move to post-listening mode
-
-              }
-              else if(result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
-                MainExe.isOut = true;
-                micMonitorThread.join();
-                break; //REM: Break out of pre-listening
-              }
+//              //REM: [TODO] .|. Remove Duplication (Refactor)
+//              if (result.toLowerCase().contains(MainExe.MAGIC_PHRASE)) {
+//                System.out.println("Magic phrase detected! Activating post-listening...");
+//                MainExe.startPostListening(recognizer, microphone);  //REM: Move to post-listening mode
+//
+//              }
+//              else if(result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
+//                MainExe.isOut = true;
+//                micMonitorThread.join();
+//                break; //REM: Break out of pre-listening
+//              }
             } else {
               String result = recognizer.getPartialResult();
               System.out.println("Partial result: " + (result));
@@ -164,7 +168,9 @@ public class MainExe {
                 MainExe.startPostListening(recognizer, microphone);  //REM: Move to post-listening mode
 
               }
-              else if(result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
+              else if(
+                Arrays.stream(LBL_CMD_IMMEDIATE_SHUTDOWN).anyMatch(result::contains)
+              ) {
                 MainExe.isOut = true;
                 micMonitorThread.join();
                 break; //REM: Break out of pre-listening
@@ -206,21 +212,22 @@ public class MainExe {
 //            final int indexBegin = result.indexOf(':') + 1;
 //            result = result.substring(indexBegin, result.length() - 1).trim();
 //            result = result.replaceAll("^\"|\"$", "").trim();
-            System.out.println("Post-listening recognized: " + result);
-            //REM: Add logic to handle post-listening commands or actions
-            //REM: [TODO] .|. Remove Duplication (Refactor)
-            if (result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
-              MainExe.isOut = true;
-              Thread.sleep(2500);
-              break; //REM: Break out of post-listening
-            }
-            else if (result.toLowerCase().contains(LBL_CMD_ABORT)) {
-              break; //REM: Break out of post-listening
-            }
+//            System.out.println("Post-listening recognized: " + result);
+//            //REM: Add logic to handle post-listening commands or actions
+
+//            //REM: [TODO] .|. Remove Duplication (Refactor)
+//            if (result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
+//              MainExe.isOut = true;
+//              Thread.sleep(2500);
+//              break; //REM: Break out of post-listening
+//            }
+//            else if (result.toLowerCase().contains(LBL_CMD_ABORT)) {
+//              break; //REM: Break out of post-listening
+//            }
           } else {
             String result = recognizer.getPartialResult();
             System.out.println("Post-listening Partial result: " + result);
-            if (result.toLowerCase().contains(LBL_CMD_IMMEDIATE_SHUTDOWN)) {
+            if (Arrays.stream(LBL_CMD_IMMEDIATE_SHUTDOWN).anyMatch(result::contains) ) {
               MainExe.isOut = true;
               Thread.sleep(2500);
               break; //REM: Break out of post-listening
