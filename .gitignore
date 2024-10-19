@@ -4,7 +4,9 @@
 .misc/
 build/
 lib/
+!lib/**/
 !lib/**/.keeper
+!**/.keeper
 
 .env.dev*
 .env.local
